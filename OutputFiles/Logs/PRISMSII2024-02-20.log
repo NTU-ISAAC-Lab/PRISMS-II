@@ -1,0 +1,47 @@
+02/20/2024 11:03:15: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+02/20/2024 11:03:15:                             
+02/20/2024 11:03:15: .~ PRISMS II ~.
+02/20/2024 11:03:15:                             
+02/20/2024 11:03:15: Author: John Archibald Page 
+02/20/2024 11:03:15: Created on: 30/11/2022      
+02/20/2024 11:03:15: Last updated on: 02/01/2024 
+02/20/2024 11:03:15: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+02/20/2024 11:03:15: Initiating program...
+02/20/2024 11:04:50: Emergency stop not connected...
+02/20/2024 11:04:50: display thread not connected...
+02/20/2024 11:04:50: Main Threads not connected...
+02/20/2024 11:04:50: Set up not connected...
+02/20/2024 11:04:50: Routines not connected...
+02/20/2024 11:04:50: Ready...
+02/20/2024 11:05:18: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+02/20/2024 11:05:18:                             
+02/20/2024 11:05:18: .~ PRISMS II ~.
+02/20/2024 11:05:18:                             
+02/20/2024 11:05:18: Author: John Archibald Page 
+02/20/2024 11:05:18: Created on: 30/11/2022      
+02/20/2024 11:05:18: Last updated on: 02/01/2024 
+02/20/2024 11:05:18: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+02/20/2024 11:05:18: Initiating program...
+02/20/2024 11:05:35: matplotlib data path: C:\Users\PHY3PAGEJ\AppData\Local\Programs\Python\Python311\Lib\site-packages\matplotlib\mpl-data
+02/20/2024 11:05:35: CONFIGDIR=C:\Users\PHY3PAGEJ\.matplotlib
+02/20/2024 11:05:35: interactive is False
+02/20/2024 11:05:35: platform is win32
+02/20/2024 11:05:35: CACHEDIR=C:\Users\PHY3PAGEJ\.matplotlib
+02/20/2024 11:05:35: Using fontManager instance from C:\Users\PHY3PAGEJ\.matplotlib\fontlist-v330.json
+02/20/2024 11:05:36: Light Mount not connected...
+02/20/2024 11:05:36: Focuser speed = Setting 1
+02/20/2024 11:05:36: Focuser speed = 250 steps/s
+02/20/2024 11:05:36: Ready...
+02/20/2024 11:06:22: Mount moved -1° on azi axis
+02/20/2024 11:06:23: Mount moved -1° on azi axis
+02/20/2024 11:06:24: Mount moved 1° on azi axis
+02/20/2024 11:06:25: Mount moved 1° on azi axis
+02/20/2024 11:06:25: Mount moved 1° on azi axis
+02/20/2024 11:06:40: Mount moved -1° on azi axis
+02/20/2024 11:06:40: Mount moved -1° on azi axis
+02/20/2024 11:06:41: Mount moved 1° on alt axis
+02/20/2024 11:06:41: Mount moved 1° on alt axis
+02/20/2024 11:06:41: Mount moved 1° on alt axis
+02/20/2024 11:06:46: Exposure  = 15.0 ms
+02/20/2024 11:07:08: Focuser moved -5000 steps
+02/20/2024 11:07:17: Data capture paused
