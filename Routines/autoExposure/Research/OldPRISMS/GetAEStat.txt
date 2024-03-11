@@ -1,0 +1,105 @@
+ public processError GetAEStats(byte[] bI, int sX, int sY, ref statsAE mStats)
+        {
+            try
+            {
+                //Check bounds
+                if ((mStats.nlA == 0) || (mStats.nlA > 1))
+                    return processError.OUT_OF_BOUNDS;
+                if ((mStats.nlB == 0) || (mStats.nlB > 1))
+                    return processError.OUT_OF_BOUNDS;
+                if ((mStats.nlC == 0) || (mStats.nlC > 1))
+                    return processError.OUT_OF_BOUNDS;
+                if ((mStats.percentNPG == 0) || (mStats.percentNPG > 1))
+                    return processError.OUT_OF_BOUNDS;
+
+                //Create an OpenCV U16 buffer of the requisite size
+                IplImage iI = Cv.CreateImage(new CvSize(sX, sY), BitDepth.U16, 1);
+
+                //Create an OpenCV float buffer of the requisite size
+                IplImage wI = Cv.CreateImage(new CvSize(sX, sY), BitDepth.F32, 1);
+
+                //Copy the incoming image to an OpenCV buffer
+                Marshal.Copy(bI, 0, iI.ImageData, sX * sY * 2);
+
+                //Convert the buffer to float at 14-bit resolution
+                Cv.ConvertScale(iI, wI, (double)(1.0 / (double)U14));
+
+                //Create histogram environment
+                int bins = U14;
+                int[] hist_size = { bins };
+                float[] intensity_ranges = { 0, (float)1.0 };
+                float[][] ranges = { intensity_ranges };
+
+                //Create the histogram buffer
+                CvHistogram mHisto = new CvHistogram(hist_size, HistogramFormat.Array, ranges);
+
+                //Get histogram information of the float buffer
+                mHisto.Calc(wI);
+
+                //Get total number of pixels 
+                mStats.nPixels = sX * sY;
+
+                //Get the number of pixels greater than saturation value * percentage
+                int histoR = Convert.ToInt32(U14 * mStats.percentNPG);
+
+                //Reset the pixel counter
+                mStats.nPixelsGreater = 0;
+
+                //Get the histogram information for this bin and every bin above it
+                for (int i = histoR; i < bins; i++)
+                    mStats.nPixelsGreater += Convert.ToInt32(mHisto.QueryValue1D(i));
+
+                //What is the maximum intensity
+                int maxI = 0;
+
+                //Iterate through the bins
+                /*for (int i = satValueU; i >= 0; i--)
+                    if (mHisto.QueryValue1D(i) > 10)
+                    {
+                        //Note the position
+                        maxI = i;
+
+                        //Break out of the for loop
+                        break;
+                    }*/
+
+                int sumPixels = 0;
+
+                //Iterate through the bins until number of pixels is greater than nlB * nPixels
+                for (int i = 0; i < satValueU; i++)
+                {
+                    //Sum the pixels
+                    sumPixels += Convert.ToInt32(mHisto.QueryValue1D(i));
+
+                    //Is the sum greater than nlB * nPixels?
+                    if (sumPixels > (mStats.nPixels * mStats.nlB))
+                    {
+                        //Read the bin number
+                        mStats.intensityA = i;
+
+                        //Break the loop
+                        break;
+                    }
+                }
+
+                //Get the intensity value for pixels at rank nlB
+                //mStats.intensityA = Convert.ToInt32(mStats.nlB * maxI);
+
+                //Get the number of saturated pixels
+                mStats.satPixels = Convert.ToInt32(mHisto.QueryValue1D(satValueU));
+
+                //Signal success
+                return processError.NOERR;
+
+
+            }
+            catch (Exception processE)
+            {
+                //Dump to the log file if needed
+                if (mTrace.TraceVerbose)
+                    Trace.WriteLine(processE.ToString());
+
+                return processError.ERROR;
+            }
+
+        }

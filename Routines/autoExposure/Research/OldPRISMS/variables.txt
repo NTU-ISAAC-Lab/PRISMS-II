@@ -1,0 +1,19 @@
+public struct optimumIntegration
+    {
+        public double nlA;                             //The mean of the top nlb percent pixel intensity required
+        public double nlB;                             //The top nlb percent pixel intensity required
+        public double nlC;                             //The maximum percentage of saturated pixels allowed
+    }
+public struct statsAE
+    {
+         //Input
+         public double percentNPG;                 //Percentage to calculate nPixelsGreater -98percent in config
+         public double nlA;                        //Percentage of saturation = desired max cts for opt integration
+         public double nlB;                        //use the top nlb percent pixel intensity as the max cts to calc opt integration -95% in config
+         public double nlC;                        //The maximum percentage of saturated pixels allowed
+         //Output
+         public int nPixels;                    //Number of pixels in the image
+         public int nPixelsGreater;             //Number of pixels greater than a defined value
+         public int intensityA;                 //Intensity of the top nlb% of image intensity
+         public int satPixels;                  //Number of pixels at saturation
+     }

@@ -1,0 +1,147 @@
+ private void GetAE()
+        {
+            //Set the camera to SNAP mode
+            //camCtrl.SetAcqMode(camMode.SNAP);
+
+            //Queue a message
+            //queue.Produce("Camera set to SNAP mode");
+
+            //allowGrab = false;
+
+            //Constant for initial value of exposure; changed from 100 to 50ms HL 07/08/22
+            const int initialE = 30;
+
+            try
+            {
+                int tE = initialE;
+
+                //Assign a local buffer to store the byte image
+                byte[] tImage = new byte[camCtrl.GetSizeX() * camCtrl.GetSizeY() * 2];
+
+                //Set the camera acquisition mode to snap (single-shot)
+                //camCtrl.SetAcqMode(vlMode.SNAP);
+
+                //Assign the control variables for AE algorithm
+                mStats.nlA = mCap.nOptIntegration.nlA;
+                mStats.nlB = mCap.nOptIntegration.nlB;
+                mStats.nlC = mCap.nOptIntegration.nlC;
+
+                if (mStats.nlA == 0.0 || mStats.nlB == 0.0)
+                {
+                    //Queue a message
+                    queue.Produce("Error in nlA, nlB parameters");
+
+                    //Queue a message
+                    queue.Produce("Aborting....");
+
+                    return;
+                }
+
+                queue.Produce("Getting AE stats...");
+
+                //Iterate until we get an image that is just below saturation
+                do
+                {
+                    //Halve the exposure each iteration
+                    tE /= 2;
+
+                    //Set the exposure time
+                    camCtrl.SetExposureTimeMSec(Convert.ToUInt32(tE));
+
+                    camError cRes = 0;
+                    //Snap an image
+                    //cRes = camCtrl.Snap(tImage);
+                    camCtrl.Grab(tImage);
+
+                    //Get the stats
+                    processImage.GetAEStats(tImage, camCtrl.GetSizeX(), camCtrl.GetSizeY(), ref mStats);
+
+                }
+
+                while (mStats.nPixelsGreater > (mStats.nlC * mStats.nPixels));
+               
+                
+                if (mStats.intensityA < (mStats.nlA * processImage.satValueU))
+                {
+                    queue.Produce(String.Format("IF low intensity, tE is  {0}", tE));
+                    //Calculate optimum exposure time
+                    if (mStats.intensityA != 0)
+                        if (typeCamera == "VIS")
+                            tE = Convert.ToInt32(tE * ((mStats.nlA * processImage.satValueU) / mStats.intensityA));
+                        else
+                            tE = Convert.ToInt32(tE * ((mStats.nlA * processImage.satValueU) /
+                                (mStats.intensityA + 32 + 0.77 * tE - 8.4e-5 * Math.Pow(tE, 2))));
+
+                    else
+                    {
+                        queue.Produce("Error calculating autoexposure. Returning to default value");
+                        tE = 100;
+                    }
+
+
+                    //Set the exposure time
+                    camCtrl.SetExposureTimeMSec(Convert.ToUInt32(tE));
+
+                    //Grab an image
+                    camCtrl.Grab(tImage);
+
+                    //Get the stats
+                    processImage.GetAEStats(tImage, camCtrl.GetSizeX(), camCtrl.GetSizeY(), ref mStats);
+
+                    //Are we too saturated
+                    if (mStats.satPixels > (mStats.nlC * mStats.nPixels))
+                    {
+                        //To implement: send warning to status console regarding number of saturated pixels
+                        StringBuilder mText = new StringBuilder();
+                        mText.AppendFormat("Warning: {0} is saturated!", mStats.satPixels);
+                        //MessageBox.Show(mText.ToString());
+                    }
+
+                }
+                else
+                {
+                    //added if else HL 18/08/22
+                    if (mStats.satPixels > (mStats.nlC * mStats.nPixels))
+                    {
+                        queue.Produce(String.Format("number of saturated pixels is  {0}", mStats.satPixels));
+                        //To implement: send warning to status console regarding number of saturated pixels
+                        StringBuilder mText = new StringBuilder();
+                        mText.AppendFormat("Warning: {0} is saturated!", mStats.satPixels);
+                        //MessageBox.Show(mText.ToString());
+                    }
+                    else
+                    {
+                        //Calculate optimum exposure time; inverted the scaling HL 18/08/22
+                        queue.Produce(String.Format("IF high intensity, tE is  {0}", tE));
+                        tE = Convert.ToInt32(tE * ((mStats.nlA * processImage.satValueU) / mStats.intensityA));
+                       // tE = Convert.ToInt32(tE * (mStats.intensityA / (mStats.nlA * processImage.satValueU)));
+                    }
+                    
+                    //Set the exposure time
+                    camCtrl.SetExposureTimeMSec(Convert.ToUInt32(tE));
+
+                }
+
+                queue.Produce("AE stats calculated and exposure set.");
+
+
+                //Set the camera acquisition mode to live (camera controlled)
+                //camCtrl.SetAcqMode(camMode.LIVE);
+
+                //queue.Produce("Camera set to LIVE mode");
+
+
+                //allowGrab = true;
+
+
+
+            }
+            catch (Exception processE)
+            {
+                //Dump to the log file if needed
+                if (mTrace.TraceVerbose)
+                    Trace.WriteLine(processE.ToString());
+
+                MessageBox.Show(processE.ToString());
+            }
+        }
